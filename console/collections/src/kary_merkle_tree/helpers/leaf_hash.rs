@@ -31,8 +31,9 @@ pub trait LeafHash: Clone + Send + Sync {
     fn hash_leaves(&self, leaves: &[Self::Leaf]) -> Result<Vec<Self::Hash>> {
         match leaves.len() {
             0 => Ok(vec![]),
-            1..=100 => leaves.iter().map(|leaf| self.hash_leaf(leaf)).collect(),
-            _ => cfg_iter!(leaves).map(|leaf| self.hash_leaf(leaf)).collect(),
+            // 1..=100 => leaves.iter().map(|leaf| self.hash_leaf(leaf)).collect(),
+            // _ => cfg_iter!(leaves).map(|leaf| self.hash_leaf(leaf)).collect(),
+            _ => leaves.iter().map(|leaf| self.hash_leaf(leaf)).collect(),
         }
     }
 }

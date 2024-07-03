@@ -36,8 +36,9 @@ pub trait PathHash: Clone + Send + Sync {
     fn hash_all_children(&self, child_nodes: &[&[Self::Hash]]) -> Result<Vec<Self::Hash>> {
         match child_nodes.len() {
             0 => Ok(vec![]),
-            1..=100 => child_nodes.iter().map(|children| self.hash_children(children)).collect(),
-            _ => cfg_iter!(child_nodes).map(|children| self.hash_children(children)).collect(),
+            // 1..=100 => child_nodes.iter().map(|children| self.hash_children(children)).collect(),
+            // _ => cfg_iter!(child_nodes).map(|children| self.hash_children(children)).collect(),
+            _ => child_nodes.iter().map(|children| self.hash_children(children)).collect(),
         }
     }
 }

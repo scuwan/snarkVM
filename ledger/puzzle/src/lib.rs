@@ -86,8 +86,8 @@ pub trait PuzzleTrait<N: Network>: Send + Sync {
 pub struct Puzzle<N: Network> {
     /// The core puzzle.
     inner: Arc<dyn PuzzleTrait<N>>,
-    /// The LRU cache of solution IDs to proof targets.
-    proof_target_cache: Arc<RwLock<LruCache<SolutionID<N>, u64>>>,
+    // The LRU cache of solution IDs to proof targets.
+    //proof_target_cache: Arc<RwLock<LruCache<SolutionID<N>, u64>>>,
 }
 
 impl<N: Network> Puzzle<N> {
@@ -95,7 +95,7 @@ impl<N: Network> Puzzle<N> {
     pub fn new<P: PuzzleTrait<N> + 'static>() -> Self {
         Self {
             inner: Arc::new(P::new()),
-            proof_target_cache: Arc::new(RwLock::new(LruCache::new(NonZeroUsize::new(CACHE_SIZE).unwrap()))),
+            //proof_target_cache: Arc::new(RwLock::new(LruCache::new(NonZeroUsize::new(CACHE_SIZE).unwrap()))),
         }
     }
 
@@ -141,9 +141,9 @@ impl<N: Network> Puzzle<N> {
     /// Returns the proof target given the partial solution.
     pub fn get_proof_target_from_partial_solution(&self, partial_solution: &PartialSolution<N>) -> Result<u64> {
         // If the proof target is in the cache, then return it.
-        if let Some(proof_target) = self.proof_target_cache.write().get(&partial_solution.id()) {
-            return Ok(*proof_target);
-        }
+        //if let Some(proof_target) = self.proof_target_cache.write().get(&partial_solution.id()) {
+        //    return Ok(*proof_target);
+        //}
 
         // Construct the leaves of the Merkle tree.
         let leaves = self.get_leaves(partial_solution)?;
@@ -151,7 +151,7 @@ impl<N: Network> Puzzle<N> {
         let proof_target = Self::leaves_to_proof_target(&leaves)?;
 
         // Insert the proof target into the cache.
-        self.proof_target_cache.write().put(partial_solution.id(), proof_target);
+        //self.proof_target_cache.write().put(partial_solution.id(), proof_target);
         // Return the proof target.
         Ok(proof_target)
     }
@@ -166,19 +166,20 @@ impl<N: Network> Puzzle<N> {
         // Iterate over the solutions.
         for (i, (id, solution)) in solutions.iter().enumerate() {
             // Check if the proof target is in the cache.
-            match self.proof_target_cache.write().get(id) {
-                // If the proof target is in the cache, then store it.
-                Some(proof_target) => {
-                    // Ensure that the proof target matches the expected proof target.
-                    ensure!(
-                        solution.target() == *proof_target,
-                        "The proof target does not match the expected proof target"
-                    );
-                    targets[i] = *proof_target
-                }
-                // Otherwise, add it to the list of solutions that need to be computed.
-                None => to_compute.push((i, id, *solution)),
-            }
+            //match self.proof_target_cache.write().get(id) {
+            //    // If the proof target is in the cache, then store it.
+            //    Some(proof_target) => {
+            //        // Ensure that the proof target matches the expected proof target.
+            //        ensure!(
+            //            solution.target() == *proof_target,
+            //            "The proof target does not match the expected proof target"
+            //        );
+            //        targets[i] = *proof_target
+            //    }
+            //    // Otherwise, add it to the list of solutions that need to be computed.
+            //    None => to_compute.push((i, id, *solution)),
+            //}
+            to_compute.push((i, id, *solution));
         }
 
         if !to_compute.is_empty() {
@@ -198,7 +199,7 @@ impl<N: Network> Puzzle<N> {
                         "The proof target does not match the expected proof target"
                     );
                     // Insert the proof target into the cache.
-                    self.proof_target_cache.write().put(*solution_id, proof_target);
+                    //self.proof_target_cache.write().put(*solution_id, proof_target);
                     // Return the proof target.
                     Ok((solution_id, proof_target))
                 })

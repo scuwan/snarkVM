@@ -55,16 +55,17 @@ impl<N: Network, A: Aleo<Network = N>> PuzzleTrait<N> for SynthesisPuzzle<N, A> 
         // Construct the epoch program inputs.
         let inputs = epoch_program.construct_inputs(rng)?;
         // Spawn a thread to ensure the circuit is synthesized in a thread-safe environment.
-        let handle = std::thread::spawn(move || {
-            // Synthesize the circuit and return the assignment.
-            epoch_program.to_leaves::<A>(inputs)
-        });
-        // Return the leaves.
-        match handle.join() {
-            Ok(Ok(leaves)) => Ok(leaves),
-            Ok(Err(error)) => Err(error),
-            Err(error) => bail!("Failed to join thread in 'SynthesisPuzzle::to_leaves': {error:?}"),
-        }
+        // let handle = std::thread::spawn(move || {
+        //     // Synthesize the circuit and return the assignment.
+        //     epoch_program.to_leaves::<A>(inputs)
+        // });
+        // // Return the leaves.
+        // match handle.join() {
+        //     Ok(Ok(leaves)) => Ok(leaves),
+        //     Ok(Err(error)) => Err(error),
+        //     Err(error) => bail!("Failed to join thread in 'SynthesisPuzzle::to_leaves': {error:?}"),
+        // }
+        epoch_program.to_leaves::<A>(inputs)
     }
 
     /// Returns the batches of leaves for the puzzle, given the epoch hash and seeded RNGs.
